@@ -1,0 +1,253 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+@import '../../packages/design-tokens/tokens.css';
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --color-ink: #1c2430;
+  --color-inksoft: #5c6570;
+  --color-line: #e4dcce;
+  --color-bg: #f4efe6;
+  --color-surface: #fffdf8;
+  --color-primary: #24344d;
+  --color-accent: #c9892e;
+  --color-teal: #0f766e;
+  --color-rose: #be3b4a;
+  --radius-control: 12px;
+  --radius-card: 16px;
+  --radius-sheet: 24px;
+}
+
+html {
+  min-height: 100%;
+  background: var(--fo-bg);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  min-height: 100dvh;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(1200px 480px at 0% -10%, rgb(201 137 46 / 0.08), transparent 50%),
+    var(--fo-bg);
+  color: var(--fo-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  touch-action: manipulation;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgb(201 137 46 / 0.22);
+  color: var(--fo-ink);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+.paper {
+  background: var(--fo-white);
+  box-shadow: var(--fo-shadow);
+  border: 1px solid var(--fo-line);
+}
+
+.fo-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 72rem;
+  padding: 20px 16px 32px;
+}
+
+@media (min-width: 640px) {
+  .fo-page {
+    padding: 24px 24px 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .fo-page {
+    padding: 28px 32px 48px;
+  }
+}
+
+.fo-kicker {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fo-accent);
+}
+
+.fo-h1 {
+  margin: 6px 0 0;
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--fo-ink);
+}
+
+.fo-hint {
+  margin: 6px 0 0;
+  max-width: 42rem;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--fo-ink-soft);
+}
+
+.fo-mark {
+  height: 6px;
+  width: 44px;
+  border-radius: 999px;
+  background: var(--fo-accent);
+}
+
+button,
+a,
+[role='button'] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+a,
+select,
+input,
+textarea {
+  outline: none;
+}
+
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  box-shadow: 0 0 0 3px rgb(201 137 46 / 0.35);
+}
+
+input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='file']),
+select,
+textarea {
+  min-height: var(--fo-tap);
+  width: 100%;
+  border: 1px solid var(--fo-line);
+  border-radius: var(--fo-radius-control);
+  background: var(--fo-white);
+  padding: 10px 14px;
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--fo-ink);
+  transition: border-color 150ms, box-shadow 150ms;
+}
+
+label input:not([type='checkbox']):not([type='radio']),
+label select,
+label textarea {
+  margin-top: 6px;
+}
+
+textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+input:hover:not(:disabled):not([type='checkbox']):not([type='radio']),
+select:hover:not(:disabled),
+textarea:hover:not(:disabled) {
+  border-color: #d3c8b4;
+}
+
+@media (min-width: 768px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='file']),
+  select,
+  textarea {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *:not(.fo-spinner):not(.fo-spinner::before):not(.fo-spinner::after) {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.fo-spinner {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+}
+
+.fo-spinner::before,
+.fo-spinner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 3px solid rgb(228 220 206 / 0.9);
+  border-top-color: var(--fo-accent);
+  animation: fo-spin 0.8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.fo-spinner::after {
+  inset: 22%;
+  border-color: transparent;
+  border-top-color: var(--fo-primary);
+  animation-duration: 1.15s;
+  animation-direction: reverse;
+}
+
+.fo-spinner i {
+  width: 22%;
+  height: 22%;
+  border-radius: 999px;
+  background: var(--fo-accent);
+  box-shadow: 0 0 12px rgb(201 137 46 / 0.45);
+}
+
+.fo-spinner-sm {
+  width: 16px;
+  height: 16px;
+}
+
+.fo-spinner-sm::before,
+.fo-spinner-sm::after {
+  border-width: 2px;
+}
+
+.fo-spinner-sm::after {
+  inset: 26%;
+}
+
+.fo-spinner-lg {
+  width: 64px;
+  height: 64px;
+}
+
+@keyframes fo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@supports (padding: max(0px)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
