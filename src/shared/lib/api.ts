@@ -1,5 +1,13 @@
 /** Sanctum fetch helper for the office SPA. Adds Bearer token and X-Organization-Id. */
 const TOKEN_KEY = 'fieldops.token'
+
+/** Empty in local Vite (proxy). Set VITE_API_URL on Vercel to the Render API origin. */
+export const API_BASE = String(import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
+
+export function apiUrl(path: string) {
+  return `${API_BASE}${path}`
+}
+
 const ADMIN_TOKEN_KEY = 'fieldops.adminToken'
 const ORG_KEY = 'fieldops.orgId'
 
@@ -55,7 +63,7 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const orgId = getOrgId()
   if (orgId) headers.set('X-Organization-Id', orgId)
 
-  const res = await fetch(path, { ...init, headers })
+  const res = await fetch(apiUrl(path), { ...init, headers })
   if (res.status === 204) return undefined as T
   const json = await res.json().catch(() => ({}))
   if (!res.ok) {

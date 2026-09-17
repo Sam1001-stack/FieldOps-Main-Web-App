@@ -9,7 +9,7 @@ import { Toaster, toast } from 'sonner'
 import { BrowserRouter, Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Bell, FileText, Flame, Map, Search, Wrench, LayoutDashboard, Columns3, Briefcase, Users, UserCog, Receipt, CreditCard, Hammer, UserRound, Menu, X } from 'lucide-react'
-import { api, getToken, setToken, beginImpersonation, stopImpersonation, isImpersonating, getOrgId, setOrgId } from './shared/lib/api'
+import { api, apiUrl, getToken, setToken, beginImpersonation, stopImpersonation, isImpersonating, getOrgId, setOrgId } from './shared/lib/api'
 import { EmptyState, JobCard, MeisterButton, PageHeader, ScreenLoader, StatusPill } from './shared/ui/kit'
 import { euros, activityLabel } from './shared/lib/ui'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -518,7 +518,7 @@ function Invoices() {
         kicker="Buchhaltung"
         title="Rechnungen"
         action={
-          <a className="text-sm font-medium text-primary underline" href="/api/v1/invoices/export">
+          <a className="text-sm font-medium text-primary underline" href={apiUrl('/api/v1/invoices/export')}>
             DATEV-CSV
           </a>
         }

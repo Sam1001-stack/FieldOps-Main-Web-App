@@ -1,0 +1,59 @@
+:root {
+  --fo-bg: #f4efe6;
+  --fo-bg-warm: #ebe4d6;
+  --fo-surface: #fffdf8;
+  --fo-ink: #1c2430;
+  --fo-ink-soft: #5c6570;
+  --fo-line: #e4dcce;
+  --fo-primary: #24344d;
+  --fo-primary-hover: #1a2638;
+  --fo-accent: #c9892e;
+  --fo-accent-hover: #b57922;
+  --fo-teal: #0f766e;
+  --fo-rose: #be3b4a;
+  --fo-violet: #6d4aff;
+  --fo-orange: #d97706;
+  --fo-emerald: #047857;
+  --fo-slate: #64748b;
+  --fo-blue: #2563eb;
+  --fo-amber: #d4a017;
+  --fo-white: #ffffff;
+  --fo-radius-control: 12px;
+  --fo-radius-card: 16px;
+  --fo-radius-sheet: 24px;
+  --fo-space-1: 4px;
+  --fo-space-2: 8px;
+  --fo-space-3: 12px;
+  --fo-space-4: 16px;
+  --fo-space-5: 20px;
+  --fo-space-6: 24px;
+  --fo-space-8: 32px;
+  --fo-type-kicker: 11px;
+  --fo-type-meta: 12px;
+  --fo-type-body: 14px;
+  --fo-type-title: 16px;
+  --fo-type-h2: 20px;
+  --fo-type-h1: 28px;
+  --fo-shadow: 0 1px 2px rgb(28 36 48 / 0.06), 0 10px 28px rgb(28 36 48 / 0.07);
+  --fo-shadow-sm: 0 1px 2px rgb(28 36 48 / 0.05);
+  --fo-font: Inter, ui-sans-serif, system-ui, sans-serif;
+  --fo-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --fo-tap: 44px;
+  --status-draft: #64748b;
+  --status-scheduled: #2563eb;
+  --status-assigned: #2563eb;
+  --status-en_route: #d4a017;
+  --status-on_site: #6d4aff;
+  --status-waiting_parts: #d97706;
+  --status-completed: #0f766e;
+  --status-invoiced: #047857;
+  --status-cancelled: #94a3b8;
+}
+
+.theme-field {
+  --fo-bg: #07080a;
+  --fo-surface: #14171c;
+  --fo-ink: #f7f4ee;
+  --fo-ink-soft: #9aa3b2;
+  --fo-line: #2a313c;
+}

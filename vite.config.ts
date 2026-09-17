@@ -8,7 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@tokens': path.resolve(__dirname, '../packages/design-tokens'),
+      '@tokens': path.resolve(__dirname, './src/styles'),
     },
   },
   server: {

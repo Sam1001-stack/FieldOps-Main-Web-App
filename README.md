@@ -38,6 +38,10 @@ npm run dev
 
 Open http://localhost:5173 — login `admin@admin.com` / `12345678`.
 
+## Vercel
+
+Root Directory: `client`. Add env `VITE_API_URL` = your Render API origin, e.g. `https://fieldops-api.onrender.com` (no trailing slash). Redeploy after setting it. Also set `FRONTEND_URL` on the API to the Vercel URL.
+
 ## Data
 
 - TanStack Query keys: `me`, `board`, `jobs`, `customers`, `members`, `notifications`, `platform-overview`, `platform-content`.
