@@ -1,8 +1,12 @@
 /** Sanctum fetch helper for the office SPA. Adds Bearer token and X-Organization-Id. */
 const TOKEN_KEY = 'fieldops.token'
 
-/** Empty in local Vite (proxy). Set VITE_API_URL on Vercel to the Render API origin. */
-export const API_BASE = String(import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
+/** Local Vite leaves this empty (proxy). Production uses the Render API. */
+const DEFAULT_API = 'https://fieldops-backend-app.onrender.com'
+
+export const API_BASE = String(
+  import.meta.env.VITE_API_URL || (import.meta.env.PROD ? DEFAULT_API : ''),
+).replace(/\/$/, '')
 
 export function apiUrl(path: string) {
   return `${API_BASE}${path}`

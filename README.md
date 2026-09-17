@@ -40,7 +40,7 @@ Open http://localhost:5173 — login `admin@admin.com` / `12345678`.
 
 ## Vercel
 
-Root Directory: `client`. Add env `VITE_API_URL` = your Render API origin, e.g. `https://fieldops-api.onrender.com` (no trailing slash). Redeploy after setting it. Also set `FRONTEND_URL` on the API to the Vercel URL.
+Root Directory: `client`. Production API is `https://fieldops-backend-app.onrender.com` (`VITE_API_URL` in `.env.production`). Also set `FRONTEND_URL` on the API to the Vercel URL.
 
 ## Data
 
