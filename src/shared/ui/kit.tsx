@@ -55,17 +55,25 @@ export function StatusPill({ status }: { status: string }) {
 }
 
 export function FoSpinner({ size = 'md', label }: { size?: 'sm' | 'md' | 'lg'; label?: string }) {
+  const ring = (
+    <span className={cn('fo-spinner', size === 'sm' && 'fo-spinner-sm', size === 'lg' && 'fo-spinner-lg')}>
+      <i />
+    </span>
+  )
+  if (size === 'sm') {
+    return (
+      <span role="status" aria-label={label ?? 'Laden'} className="inline-flex">
+        {ring}
+      </span>
+    )
+  }
   return (
     <div className="flex flex-col items-center gap-3" role="status" aria-live="polite" aria-label={label ?? 'Laden'}>
-      <span className={cn('fo-spinner', size === 'sm' && 'fo-spinner-sm', size === 'lg' && 'fo-spinner-lg')}>
-        <i />
-      </span>
-      {size !== 'sm' && (
-        <div className="text-center">
-          <p className="fo-kicker">FieldOps</p>
-          {label ? <p className="mt-1 text-sm text-inksoft">{label}</p> : null}
-        </div>
-      )}
+      {ring}
+      <div className="text-center">
+        <p className="fo-kicker">FieldOps</p>
+        {label ? <p className="mt-1 text-sm text-inksoft">{label}</p> : null}
+      </div>
     </div>
   )
 }

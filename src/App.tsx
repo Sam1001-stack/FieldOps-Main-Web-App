@@ -485,7 +485,7 @@ function Inspector({ jobId, fallback }: { jobId: string | null; fallback?: Job }
           ))}
         </div>
         {job.status === 'completed' && (
-          <MeisterButton variant="accent" className="w-full" onClick={() => invoice.mutate()} disabled={invoice.isPending}>
+          <MeisterButton variant="accent" className="w-full" onClick={() => invoice.mutate()} loading={invoice.isPending} disabled={invoice.isPending}>
             Rechnung erstellen
           </MeisterButton>
         )}
@@ -507,7 +507,7 @@ type Invoice = {
 }
 
 function Invoices() {
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['invoices'],
     queryFn: () => api<{ data: Invoice[] }>('/api/v1/invoices'),
   })
@@ -523,6 +523,7 @@ function Invoices() {
           </a>
         }
       />
+      {isLoading && <ScreenLoader label="Rechnungen werden geladen…" />}
       <div className="space-y-3">
         {invoices.map((inv) => (
           <Link key={inv.id} to={`/invoices/${inv.id}`} className="paper block rounded-[16px] p-4">
@@ -808,7 +809,7 @@ function Billing() {
   const sessionId = params.get('session_id')
   const canceled = params.get('canceled') === '1'
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['billing'],
     queryFn: () =>
       api<{
@@ -856,6 +857,7 @@ function Billing() {
         hint={`Aktueller Plan: ${data?.current ?? '…'}${data?.limits ? ` · ${data.limits.jobs} Einsätze / ${data.limits.users} Nutzer` : ''}`}
       />
       {canceled && <p className="mt-3 text-sm text-accent">Checkout abgebrochen.</p>}
+      {isLoading && <ScreenLoader label="Abrechnung wird geladen…" />}
       {!data?.configured && (
         <p className="mt-3 text-sm text-inksoft">Stripe-Schlüssel fehlen in der API-Umgebung.</p>
       )}
