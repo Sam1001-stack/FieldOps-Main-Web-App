@@ -764,8 +764,30 @@ export function ContentPagesWorkspace() {
     onError: (e: Error) => toast.error(e.message),
   })
 
+  const seed = useMutation({
+    mutationFn: () => api<ContentPage[]>('/api/v1/platform/content/seed', { method: 'POST' }),
+    onSuccess: () => {
+      toast.success('Standardseiten geladen')
+      void qc.invalidateQueries({ queryKey: ['platform-content'] })
+    },
+    onError: (e: Error) => toast.error(e.message),
+  })
+
   if (isLoading) return <ScreenLoader label="Inhalte werden geladen…" />
-  if (!selected) return <div className="fo-page"><EmptyState title="Noch keine Inhaltsseiten." /></div>
+  if (!selected) {
+    return (
+      <div className="fo-page">
+        <EmptyState
+          title="Noch keine Inhaltsseiten."
+          action={
+            <MeisterButton loading={seed.isPending} disabled={seed.isPending} onClick={() => seed.mutate()}>
+              Standardseiten laden
+            </MeisterButton>
+          }
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="fo-page mx-auto w-full max-w-6xl space-y-6">

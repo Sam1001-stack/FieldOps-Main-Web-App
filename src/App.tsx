@@ -56,8 +56,8 @@ function useMe() {
 
 function Login() {
   const nav = useNavigate()
-  const [email, setEmail] = useState('admin@admin.com')
-  const [password, setPassword] = useState('12345678')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const mut = useMutation({
     mutationFn: () =>
       api<{ token: string; user: User }>('/api/v1/auth/login', {
@@ -97,7 +97,6 @@ function Login() {
         <MeisterButton className="mt-6 w-full" loading={mut.isPending} disabled={mut.isPending}>
           {mut.isPending ? 'Prüfen…' : 'Weiter'}
         </MeisterButton>
-        <p className="mt-4 text-xs leading-5 text-inksoft">Super Admin: admin@admin.com · 12345678</p>
       </form>
     </div>
   )
@@ -1052,7 +1051,11 @@ function Billing() {
           </article>
         ))}
       </div>
-      <p className="mt-6 text-xs text-inksoft">Testkarte: ACCT-000015 · beliebiges Datum in der Zukunft · CVC 123</p>
+      <p className="mt-6 text-xs text-inksoft">
+        {data?.configured
+          ? 'Testkarte (nur bei konfiguriertem Stripe): ACCT-000015 · beliebiges Datum · CVC 123'
+          : 'Upgrade ist erst verfügbar, wenn Stripe in der API-Umgebung hinterlegt ist.'}
+      </p>
     </div>
   )
 }
