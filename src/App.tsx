@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient
 import { Toaster, toast } from 'sonner'
 import { BrowserRouter, Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { Bell, FileText, Flame, Map, Search, Wrench, LayoutDashboard, Columns3, Briefcase, Users, UserCog, Receipt, CreditCard, Hammer, UserRound, Menu, X } from 'lucide-react'
+import { Bell, FileText, Flame, Map, Search, Wrench, LayoutDashboard, Columns3, Briefcase, Users, UserCog, Receipt, CreditCard, Hammer, UserRound, Menu, X, ChevronDown } from 'lucide-react'
 import { api, downloadAuthenticated, getToken, setToken, beginImpersonation, stopImpersonation, isImpersonating, getOrgId, setOrgId } from './shared/lib/api'
 import { EmptyState, JobCard, MeisterButton, PageHeader, ScreenLoader, StatusPill } from './shared/ui/kit'
 import { euros, activityLabel } from './shared/lib/ui'
@@ -774,6 +774,7 @@ function Admin() {
     owner_email: '',
     owner_password: 'FieldOps!2026',
   })
+  const [mandantFormOpen, setMandantFormOpen] = useState<boolean | null>(null)
   const createOrg = useMutation({
     mutationFn: () =>
       api('/api/v1/platform/organizations', {
@@ -791,6 +792,7 @@ function Admin() {
         owner_email: '',
         owner_password: 'FieldOps!2026',
       })
+      setMandantFormOpen(false)
       void qc.invalidateQueries({ queryKey: ['platform-overview'] })
       void qc.invalidateQueries({ queryKey: ['me'] })
     },
@@ -806,6 +808,7 @@ function Admin() {
     )
   }
 
+  const formOpen = mandantFormOpen ?? data.organizations.length === 0
   const s = data.stats
   const cards = [
     ['Mandanten', String(s.organizations)],
@@ -834,49 +837,62 @@ function Admin() {
       </div>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Mandanten</h2>
-        <form
-          className="paper grid gap-3 rounded-[16px] p-4 md:grid-cols-2"
-          onSubmit={(e) => {
-            e.preventDefault()
-            createOrg.mutate()
-          }}
-        >
-          <p className="fo-kicker md:col-span-2">Neuen Mandanten anlegen</p>
-          <label className="block text-sm">
-            Betrieb
-            <input className="mt-1 w-full" value={tenant.name} onChange={(e) => setTenant({ ...tenant, name: e.target.value })} placeholder="Mustermann SHK GmbH" />
-          </label>
-          <label className="block text-sm">
-            Ort
-            <input className="mt-1 w-full" value={tenant.city} onChange={(e) => setTenant({ ...tenant, city: e.target.value })} />
-          </label>
-          <label className="block text-sm">
-            Straße
-            <input className="mt-1 w-full" value={tenant.street} onChange={(e) => setTenant({ ...tenant, street: e.target.value })} />
-          </label>
-          <label className="block text-sm">
-            PLZ
-            <input className="mt-1 w-full" value={tenant.zip} onChange={(e) => setTenant({ ...tenant, zip: e.target.value })} />
-          </label>
-          <label className="block text-sm">
-            Inhaber
-            <input className="mt-1 w-full" value={tenant.owner_name} onChange={(e) => setTenant({ ...tenant, owner_name: e.target.value })} />
-          </label>
-          <label className="block text-sm">
-            Inhaber-E-Mail
-            <input className="mt-1 w-full" type="email" value={tenant.owner_email} onChange={(e) => setTenant({ ...tenant, owner_email: e.target.value })} />
-          </label>
-          <label className="block text-sm md:col-span-2">
-            Inhaber-Passwort
-            <input className="mt-1 w-full" type="password" value={tenant.owner_password} onChange={(e) => setTenant({ ...tenant, owner_password: e.target.value })} />
-          </label>
-          <div className="md:col-span-2">
-            <MeisterButton type="submit" loading={createOrg.isPending} disabled={createOrg.isPending}>
-              Mandant anlegen
-            </MeisterButton>
-          </div>
-        </form>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold">Mandanten</h2>
+          <MeisterButton
+            type="button"
+            variant="ghost"
+            aria-expanded={formOpen}
+            onClick={() => setMandantFormOpen(!formOpen)}
+          >
+            {formOpen ? 'Formular schließen' : 'Neuen Mandanten anlegen'}
+            <ChevronDown className={`h-4 w-4 transition-transform ${formOpen ? 'rotate-180' : ''}`} />
+          </MeisterButton>
+        </div>
+        {formOpen && (
+          <form
+            className="paper grid gap-3 rounded-[16px] p-4 md:grid-cols-2"
+            onSubmit={(e) => {
+              e.preventDefault()
+              createOrg.mutate()
+            }}
+          >
+            <p className="fo-kicker md:col-span-2">Neuen Mandanten anlegen</p>
+            <label className="block text-sm">
+              Betrieb
+              <input className="mt-1 w-full" value={tenant.name} onChange={(e) => setTenant({ ...tenant, name: e.target.value })} placeholder="Mustermann SHK GmbH" />
+            </label>
+            <label className="block text-sm">
+              Ort
+              <input className="mt-1 w-full" value={tenant.city} onChange={(e) => setTenant({ ...tenant, city: e.target.value })} />
+            </label>
+            <label className="block text-sm">
+              Straße
+              <input className="mt-1 w-full" value={tenant.street} onChange={(e) => setTenant({ ...tenant, street: e.target.value })} />
+            </label>
+            <label className="block text-sm">
+              PLZ
+              <input className="mt-1 w-full" value={tenant.zip} onChange={(e) => setTenant({ ...tenant, zip: e.target.value })} />
+            </label>
+            <label className="block text-sm">
+              Inhaber
+              <input className="mt-1 w-full" value={tenant.owner_name} onChange={(e) => setTenant({ ...tenant, owner_name: e.target.value })} />
+            </label>
+            <label className="block text-sm">
+              Inhaber-E-Mail
+              <input className="mt-1 w-full" type="email" value={tenant.owner_email} onChange={(e) => setTenant({ ...tenant, owner_email: e.target.value })} />
+            </label>
+            <label className="block text-sm md:col-span-2">
+              Inhaber-Passwort
+              <input className="mt-1 w-full" type="password" value={tenant.owner_password} onChange={(e) => setTenant({ ...tenant, owner_password: e.target.value })} />
+            </label>
+            <div className="md:col-span-2">
+              <MeisterButton type="submit" loading={createOrg.isPending} disabled={createOrg.isPending}>
+                Mandant anlegen
+              </MeisterButton>
+            </div>
+          </form>
+        )}
         {data.organizations.length === 0 && (
           <EmptyState title="Noch keine Mandanten — ohne Betrieb kann der Live-Betrieb nicht starten." />
         )}
@@ -950,12 +966,12 @@ function Admin() {
         <h2 className="mb-3 text-lg font-semibold">Aktivität</h2>
         <div className="paper divide-y divide-line rounded-[16px]">
           {data.activity.length === 0 && <p className="p-4 text-sm text-inksoft">Noch keine Ereignisse.</p>}
-          {data.activity.map((row, i) => (
-            <div key={`${row.at}-${i}`} className="flex items-center justify-between px-4 py-3 text-sm">
+          {data.activity.slice(0, 5).map((row, i) => (
+            <div key={`${row.at}-${i}`} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
               <span>
                 <strong>{row.actor || 'System'}</strong> · {activityLabel[row.description] || row.description}
               </span>
-              <span className="text-xs text-inksoft">{row.at}</span>
+              <span className="shrink-0 text-xs text-inksoft">{row.at}</span>
             </div>
           ))}
         </div>
