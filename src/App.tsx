@@ -332,6 +332,7 @@ function Plantafel() {
   const allJobs = useMemo(() => [...unassigned, ...columns.flatMap((c) => unwrap(c.jobs))], [columns, unassigned])
   const selectedJob = allJobs.find((j) => j.id === selected)
   const qcLocal = useQueryClient()
+  const [dropTarget, setDropTarget] = useState<string | null>(null)
   const assign = useMutation({
     mutationFn: ({ jobId, monteurId }: { jobId: string; monteurId: string }) =>
       api(`/api/v1/jobs/${jobId}/assign`, { method: 'POST', body: JSON.stringify({ monteur_id: monteurId }) }),
@@ -341,10 +342,29 @@ function Plantafel() {
     },
     onError: (e: Error) => toast.error(e.message),
   })
+  const unassign = useMutation({
+    mutationFn: (jobId: string) => api(`/api/v1/jobs/${jobId}/unassign`, { method: 'POST' }),
+    onSuccess: () => {
+      toast.success('Zuweisung aufgehoben')
+      void qcLocal.invalidateQueries({ queryKey: ['board'] })
+    },
+    onError: (e: Error) => toast.error(e.message),
+  })
 
-  const onDrop = (monteurId: string, e: React.DragEvent) => {
+  const onDropAssign = (monteurId: string, e: React.DragEvent) => {
+    e.preventDefault()
+    setDropTarget(null)
     const jobId = e.dataTransfer.getData('text/job')
     if (jobId) assign.mutate({ jobId, monteurId })
+  }
+
+  const onDropUnassign = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDropTarget(null)
+    const jobId = e.dataTransfer.getData('text/job')
+    if (!jobId) return
+    if (unassigned.some((job) => job.id === jobId)) return
+    unassign.mutate(jobId)
   }
 
   return (
@@ -373,12 +393,32 @@ function Plantafel() {
         {isError && <EmptyState title="Plantafel konnte nicht geladen werden." action={<MeisterButton onClick={() => void refetch()}>Erneut versuchen</MeisterButton>} />}
         {!isLoading && !isError && (
           <div className="-mx-4 flex min-h-[56vh] gap-3 overflow-x-auto px-4 pb-6 sm:mx-0 sm:gap-4 sm:px-0">
-            <section className="min-w-[240px] flex-1 rounded-[16px] border border-dashed border-line bg-white/50 p-3 sm:min-w-[260px]">
+            <section
+              className={`min-w-[240px] flex-1 rounded-[16px] border border-dashed p-3 sm:min-w-[260px] ${
+                dropTarget === 'unassigned' ? 'border-accent bg-accent/10' : 'border-line bg-white/50'
+              }`}
+              onDragOver={(e) => {
+                e.preventDefault()
+                e.dataTransfer.dropEffect = 'move'
+                setDropTarget('unassigned')
+              }}
+              onDragLeave={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) setDropTarget(null)
+              }}
+              onDrop={onDropUnassign}
+            >
               <h2 className="mb-3 text-sm font-semibold text-inksoft">Nicht zugewiesen</h2>
               {unassigned.length === 0 && <EmptyState title="Noch keine Einsätze heute — Auftrag anlegen" />}
               <div className="space-y-2">
                 {unassigned.map((job) => (
-                  <div key={job.id} draggable onDragStart={(e) => e.dataTransfer.setData('text/job', job.id)}>
+                  <div
+                    key={job.id}
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData('text/job', job.id)
+                      e.dataTransfer.effectAllowed = 'move'
+                    }}
+                  >
                     <JobCard job={job} onClick={() => setSelected(job.id)} lift={selected === job.id} />
                   </div>
                 ))}
@@ -387,9 +427,18 @@ function Plantafel() {
             {columns.map((col) => (
               <section
                 key={col.monteur.id}
-                className="min-w-[260px] flex-1 rounded-[16px] border border-line bg-white p-3 sm:min-w-[280px]"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => onDrop(col.monteur.id, e)}
+                className={`min-w-[260px] flex-1 rounded-[16px] border bg-white p-3 sm:min-w-[280px] ${
+                  dropTarget === col.monteur.id ? 'border-accent ring-2 ring-accent/40' : 'border-line'
+                }`}
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  e.dataTransfer.dropEffect = 'move'
+                  setDropTarget(col.monteur.id)
+                }}
+                onDragLeave={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node)) setDropTarget(null)
+                }}
+                onDrop={(e) => onDropAssign(col.monteur.id, e)}
               >
                 <div className="mb-3 flex items-center justify-between">
                   <div>
@@ -406,7 +455,14 @@ function Plantafel() {
                 </div>
                 <div className="space-y-2">
                   {unwrap(col.jobs).map((job) => (
-                    <div key={job.id} draggable onDragStart={(e) => e.dataTransfer.setData('text/job', job.id)}>
+                    <div
+                      key={job.id}
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData('text/job', job.id)
+                        e.dataTransfer.effectAllowed = 'move'
+                      }}
+                    >
                       <JobCard job={job} onClick={() => setSelected(job.id)} lift={selected === job.id} />
                     </div>
                   ))}

@@ -31,6 +31,7 @@ export const statusLabel: Record<string, string> = {
 export const activityLabel: Record<string, string> = {
   'job.created': 'Einsatz angelegt',
   'job.assigned': 'Einsatz zugewiesen',
+  'job.unassigned': 'Zuweisung aufgehoben',
   'job.status': 'Status geändert',
   'invoice.created': 'Rechnung erstellt',
   'invoice.sent': 'Rechnung versendet',
