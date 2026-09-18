@@ -34,6 +34,7 @@ export const activityLabel: Record<string, string> = {
   'job.status': 'Status geändert',
   'invoice.created': 'Rechnung erstellt',
   'invoice.sent': 'Rechnung versendet',
+  'org.created': 'Mandant angelegt',
   'org.suspend.toggle': 'Mandant gesperrt/entsperrt',
   impersonation: 'Als Mandant angemeldet',
   'org.settings': 'Stammdaten geändert',

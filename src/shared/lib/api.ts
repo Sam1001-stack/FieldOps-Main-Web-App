@@ -56,6 +56,30 @@ export function isImpersonating() {
   return Boolean(localStorage.getItem(ADMIN_TOKEN_KEY))
 }
 
+export async function downloadAuthenticated(path: string, filename: string) {
+  const headers = new Headers()
+  headers.set('Accept', 'application/json, text/csv')
+  const token = getToken()
+  if (token) headers.set('Authorization', `Bearer ${token}`)
+  const orgId = getOrgId()
+  if (orgId) headers.set('X-Organization-Id', orgId)
+
+  const res = await fetch(apiUrl(path), { headers })
+  if (!res.ok) {
+    const json = await res.json().catch(() => ({}))
+    throw new Error(json.message || 'Export fehlgeschlagen')
+  }
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}
+
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers)
   headers.set('Accept', 'application/json')

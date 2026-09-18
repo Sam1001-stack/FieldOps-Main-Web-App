@@ -9,7 +9,7 @@ import { Toaster, toast } from 'sonner'
 import { BrowserRouter, Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Bell, FileText, Flame, Map, Search, Wrench, LayoutDashboard, Columns3, Briefcase, Users, UserCog, Receipt, CreditCard, Hammer, UserRound, Menu, X } from 'lucide-react'
-import { api, apiUrl, getToken, setToken, beginImpersonation, stopImpersonation, isImpersonating, getOrgId, setOrgId } from './shared/lib/api'
+import { api, downloadAuthenticated, getToken, setToken, beginImpersonation, stopImpersonation, isImpersonating, getOrgId, setOrgId } from './shared/lib/api'
 import { EmptyState, JobCard, MeisterButton, PageHeader, ScreenLoader, StatusPill } from './shared/ui/kit'
 import { euros, activityLabel } from './shared/lib/ui'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -506,6 +506,26 @@ type Invoice = {
   organization?: { name?: string; street?: string; zip?: string; city?: string; tax_number?: string; iban?: string }
 }
 
+function DatevExportLink() {
+  const [busy, setBusy] = useState(false)
+  return (
+    <button
+      type="button"
+      className="text-sm font-medium text-primary underline disabled:opacity-50"
+      disabled={busy}
+      onClick={() => {
+        setBusy(true)
+        void downloadAuthenticated('/api/v1/invoices/export', 'datev-export.csv')
+          .then(() => toast.success('DATEV-Export gespeichert'))
+          .catch((e: Error) => toast.error(e.message))
+          .finally(() => setBusy(false))
+      }}
+    >
+      {busy ? 'Export…' : 'DATEV-CSV'}
+    </button>
+  )
+}
+
 function Invoices() {
   const { data, isLoading } = useQuery({
     queryKey: ['invoices'],
@@ -517,11 +537,7 @@ function Invoices() {
       <PageHeader
         kicker="Buchhaltung"
         title="Rechnungen"
-        action={
-          <a className="text-sm font-medium text-primary underline" href={apiUrl('/api/v1/invoices/export')}>
-            DATEV-CSV
-          </a>
-        }
+        action={<DatevExportLink />}
       />
       {isLoading && <ScreenLoader label="Rechnungen werden geladen…" />}
       <div className="space-y-3">
@@ -542,9 +558,12 @@ function Invoices() {
 function InvoiceDetail() {
   const id = window.location.pathname.split('/').pop() ?? ''
   const qcLocal = useQueryClient()
-  const { data } = useQuery({
+  const hasToken = Boolean(getToken())
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['invoice', id],
     queryFn: () => api<Invoice>(`/api/v1/invoices/${id}`),
+    enabled: hasToken,
+    retry: false,
   })
   const send = useMutation({
     mutationFn: () => api(`/api/v1/invoices/${id}/send`, { method: 'POST' }),
@@ -554,7 +573,18 @@ function InvoiceDetail() {
     },
     onError: (e: Error) => toast.error(e.message),
   })
-  if (!data) return <ScreenLoader label="Rechnung wird geladen…" />
+  if (!hasToken) return <Navigate to="/login" />
+  if (isLoading) return <ScreenLoader label="Rechnung wird geladen…" />
+  if (isError || !data) {
+    return (
+      <div className="grid min-h-dvh place-items-center p-8">
+        <EmptyState
+          title="Rechnung konnte nicht geladen werden."
+          action={<MeisterButton onClick={() => void refetch()}>Erneut versuchen</MeisterButton>}
+        />
+      </div>
+    )
+  }
   return (
     <div className="min-h-dvh bg-[#ece7de] p-4 sm:p-8">
       <div className="mx-auto max-w-3xl">
@@ -680,6 +710,38 @@ function Admin() {
     onError: (e: Error) => toast.error(e.message),
   })
 
+  const [tenant, setTenant] = useState({
+    name: '',
+    city: 'Frankfurt am Main',
+    street: '',
+    zip: '',
+    owner_name: '',
+    owner_email: '',
+    owner_password: 'FieldOps!2026',
+  })
+  const createOrg = useMutation({
+    mutationFn: () =>
+      api('/api/v1/platform/organizations', {
+        method: 'POST',
+        body: JSON.stringify(tenant),
+      }),
+    onSuccess: () => {
+      toast.success('Mandant angelegt')
+      setTenant({
+        name: '',
+        city: 'Frankfurt am Main',
+        street: '',
+        zip: '',
+        owner_name: '',
+        owner_email: '',
+        owner_password: 'FieldOps!2026',
+      })
+      void qc.invalidateQueries({ queryKey: ['platform-overview'] })
+      void qc.invalidateQueries({ queryKey: ['me'] })
+    },
+    onError: (e: Error) => toast.error(e.message),
+  })
+
   if (isLoading) return <ScreenLoader label="Plattform wird geladen…" />
   if (isError || !data) {
     return (
@@ -718,6 +780,51 @@ function Admin() {
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Mandanten</h2>
+        <form
+          className="paper grid gap-3 rounded-[16px] p-4 md:grid-cols-2"
+          onSubmit={(e) => {
+            e.preventDefault()
+            createOrg.mutate()
+          }}
+        >
+          <p className="fo-kicker md:col-span-2">Neuen Mandanten anlegen</p>
+          <label className="block text-sm">
+            Betrieb
+            <input className="mt-1 w-full" value={tenant.name} onChange={(e) => setTenant({ ...tenant, name: e.target.value })} placeholder="Mustermann SHK GmbH" />
+          </label>
+          <label className="block text-sm">
+            Ort
+            <input className="mt-1 w-full" value={tenant.city} onChange={(e) => setTenant({ ...tenant, city: e.target.value })} />
+          </label>
+          <label className="block text-sm">
+            Straße
+            <input className="mt-1 w-full" value={tenant.street} onChange={(e) => setTenant({ ...tenant, street: e.target.value })} />
+          </label>
+          <label className="block text-sm">
+            PLZ
+            <input className="mt-1 w-full" value={tenant.zip} onChange={(e) => setTenant({ ...tenant, zip: e.target.value })} />
+          </label>
+          <label className="block text-sm">
+            Inhaber
+            <input className="mt-1 w-full" value={tenant.owner_name} onChange={(e) => setTenant({ ...tenant, owner_name: e.target.value })} />
+          </label>
+          <label className="block text-sm">
+            Inhaber-E-Mail
+            <input className="mt-1 w-full" type="email" value={tenant.owner_email} onChange={(e) => setTenant({ ...tenant, owner_email: e.target.value })} />
+          </label>
+          <label className="block text-sm md:col-span-2">
+            Inhaber-Passwort
+            <input className="mt-1 w-full" type="password" value={tenant.owner_password} onChange={(e) => setTenant({ ...tenant, owner_password: e.target.value })} />
+          </label>
+          <div className="md:col-span-2">
+            <MeisterButton type="submit" loading={createOrg.isPending} disabled={createOrg.isPending}>
+              Mandant anlegen
+            </MeisterButton>
+          </div>
+        </form>
+        {data.organizations.length === 0 && (
+          <EmptyState title="Noch keine Mandanten — ohne Betrieb kann der Live-Betrieb nicht starten." />
+        )}
         {data.organizations.map((o) => (
           <article key={o.id} className="paper rounded-[16px] p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -809,7 +916,7 @@ function Billing() {
   const sessionId = params.get('session_id')
   const canceled = params.get('canceled') === '1'
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['billing'],
     queryFn: () =>
       api<{
@@ -818,6 +925,7 @@ function Billing() {
         limits: { users: number; jobs: number }
         plans: { id: string; name: string; price_cents: number; users: number; jobs: number }[]
       }>('/api/v1/billing'),
+    retry: false,
   })
 
   const sync = useMutation({
@@ -858,7 +966,10 @@ function Billing() {
       />
       {canceled && <p className="mt-3 text-sm text-accent">Checkout abgebrochen.</p>}
       {isLoading && <ScreenLoader label="Abrechnung wird geladen…" />}
-      {!data?.configured && (
+      {isError && (
+        <p className="mt-3 text-sm text-rose">Kein Mandant ausgewählt. Legen Sie zuerst einen Betrieb auf der Plattform an.</p>
+      )}
+      {!data?.configured && data && (
         <p className="mt-3 text-sm text-inksoft">Stripe-Schlüssel fehlen in der API-Umgebung.</p>
       )}
       <div className="mt-6 grid gap-4 md:grid-cols-3">

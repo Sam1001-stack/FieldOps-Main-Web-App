@@ -6,7 +6,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { toast } from 'sonner'
-import { api, apiUrl } from '../shared/lib/api'
+import { api, downloadAuthenticated } from '../shared/lib/api'
 import { activityLabel, euros, statusLabel } from '../shared/lib/ui'
 import { EmptyState, MeisterButton, PageHeader, ScreenLoader, StatusPill } from '../shared/ui/kit'
 
@@ -617,9 +617,17 @@ export function AccountantWorkspace() {
         kicker="Buchhaltung"
         title="Rechnungen"
         action={
-          <a className="text-sm font-medium text-primary underline" href={apiUrl('/api/v1/invoices/export')}>
+          <button
+            type="button"
+            className="text-sm font-medium text-primary underline"
+            onClick={() => {
+              void downloadAuthenticated('/api/v1/invoices/export', 'datev-export.csv')
+                .then(() => toast.success('DATEV-Export gespeichert'))
+                .catch((e: Error) => toast.error(e.message))
+            }}
+          >
             DATEV-CSV
-          </a>
+          </button>
         }
       />
       {isLoading && <ScreenLoader label="Rechnungen werden geladen…" />}
