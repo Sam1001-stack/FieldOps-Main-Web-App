@@ -1,0 +1,305 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>FieldOps screen capture</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #111; font-family: Inter, system-ui, sans-serif; }
+  .phone {
+    width: 390px; height: 844px; overflow: hidden; position: relative;
+    margin: 0 auto;
+  }
+  .screen { display: none; width: 390px; height: 844px; padding: 54px 20px 28px; }
+  .screen.on { display: block; }
+  .status {
+    position: absolute; top: 12px; left: 22px; right: 22px; height: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; font-weight: 600; z-index: 2;
+  }
+  .home-bar {
+    position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%);
+    width: 120px; height: 4px; border-radius: 99px; opacity: .55;
+  }
+  /* Field dark */
+  .field { background: #07080A; color: #F7F4EE; }
+  .field .status { color: #F7F4EE; }
+  .field .home-bar { background: #F7F4EE; }
+  .field .kicker { color: #D4A017; font-size: 11px; font-weight: 800; letter-spacing: 1.6px; margin-top: 8px; }
+  .field .h1 { font-size: 32px; font-weight: 700; margin-top: 8px; line-height: 1.1; }
+  .field .lead { color: #9AA3B2; margin-top: 10px; line-height: 1.45; font-size: 14px; }
+  .field .input {
+    margin-top: 12px; background: #14171C; border: 1px solid #2A313C; border-radius: 14px;
+    padding: 16px; color: #9AA3B2; font-size: 15px;
+  }
+  .field .cta {
+    margin-top: 16px; background: #D4A017; color: #1A1408; text-align: center;
+    border-radius: 14px; padding: 16px; font-weight: 800;
+  }
+  .field .links { margin-top: 18px; color: #9AA3B2; font-size: 12px; text-align: center; line-height: 1.9; }
+  .field .mark { width: 36px; height: 4px; background: #D4A017; border-radius: 99px; }
+  .field .org { color: #D4A017; font-size: 12px; font-weight: 700; }
+  .field .title { font-size: 28px; font-weight: 700; margin-top: 4px; }
+  .field .card {
+    background: #14171C; border: 1px solid #2A313C; border-radius: 18px; padding: 16px; margin-top: 14px;
+  }
+  .field .card h3 { font-size: 17px; margin-bottom: 6px; }
+  .field .meta { color: #9AA3B2; font-size: 13px; line-height: 1.4; }
+  .field .pipeline { display: flex; gap: 8px; margin: 12px 0; }
+  .field .pipe {
+    flex: 1; text-align: center; font-size: 11px; font-weight: 700; color: #9AA3B2;
+    border-bottom: 2px solid #2A313C; padding-bottom: 6px;
+  }
+  .field .pipe.on { color: #D4A017; border-color: #D4A017; }
+  .field .row { display: flex; gap: 8px; }
+  .field .btn {
+    flex: 1; text-align: center; padding: 12px; border-radius: 12px; font-weight: 700; font-size: 13px;
+  }
+  .field .btn.navy { background: #3D5273; color: #fff; }
+  .field .btn.gold { background: #D4A017; color: #1A1408; }
+  .field .badge {
+    display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: 11px; font-weight: 700;
+  }
+  .field .tabs {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 64px;
+    display: flex; border-top: 1px solid #2A313C; background: #07080A; padding-bottom: 12px;
+  }
+  .field .tab { flex: 1; text-align: center; padding-top: 12px; color: #9AA3B2; font-size: 12px; font-weight: 600; }
+  .field .tab.on { color: #D4A017; box-shadow: inset 0 2px 0 #D4A017; }
+  .field .job {
+    background: #14171C; border-radius: 16px; padding: 14px; margin-top: 10px; border: 1px solid #2A313C;
+  }
+
+  /* Customer cream */
+  .cust { background: #F4EFE6; color: #1C2430; }
+  .cust .status { color: #1C2430; }
+  .cust .home-bar { background: #1C2430; }
+  .cust .mark { width: 36px; height: 4px; background: #C9892E; border-radius: 99px; }
+  .cust .kicker { color: #C9892E; font-size: 11px; font-weight: 800; letter-spacing: 1.4px; margin-top: 10px; }
+  .cust .h1 { font-size: 30px; font-weight: 700; margin-top: 8px; line-height: 1.15; }
+  .cust .lead { color: #5C6570; margin-top: 10px; line-height: 1.45; font-size: 14px; }
+  .cust .seg { display: flex; gap: 8px; margin-top: 18px; background: #fff; padding: 4px; border-radius: 14px; border: 1px solid #E4DCCE; }
+  .cust .seg button {
+    flex: 1; border: 0; background: transparent; padding: 12px; border-radius: 12px; font-weight: 700; color: #5C6570;
+  }
+  .cust .seg button.on { background: #24344D; color: #fff; }
+  .cust .label { margin-top: 12px; font-size: 12px; font-weight: 600; color: #5C6570; }
+  .cust .input {
+    margin-top: 6px; background: #FFFDF8; border: 1px solid #E4DCCE; border-radius: 14px; padding: 14px; color: #5C6570;
+  }
+  .cust .cta {
+    margin-top: 16px; background: #24344D; color: #fff; text-align: center; border-radius: 14px; padding: 16px; font-weight: 700;
+  }
+  .cust .links { margin-top: 16px; color: #5C6570; font-size: 12px; text-align: center; line-height: 1.9; }
+  .cust .card {
+    background: #FFFDF8; border: 1px solid #E4DCCE; border-radius: 18px; padding: 16px; margin-top: 12px;
+  }
+  .cust .tracker { display: flex; gap: 4px; margin-top: 10px; }
+  .cust .step { flex: 1; text-align: center; font-size: 10px; font-weight: 700; color: #5C6570; }
+  .cust .step .dot { height: 4px; border-radius: 99px; background: #E4DCCE; margin-bottom: 6px; }
+  .cust .step.on .dot { background: #24344D; }
+  .cust .step.on { color: #24344D; }
+  .cust .tabs {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 64px;
+    display: flex; border-top: 1px solid #E4DCCE; background: #F4EFE6; padding-bottom: 12px;
+  }
+  .cust .tab { flex: 1; text-align: center; padding-top: 12px; color: #5C6570; font-size: 12px; font-weight: 600; }
+  .cust .tab.on { color: #24344D; box-shadow: inset 0 2px 0 #24344D; }
+  .pill { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; background: #E8F0FE; color: #1D4ED8; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <!-- FIELD LOGIN -->
+  <section id="field-login" class="screen field">
+    <div class="status"><span>9:41</span><span>â– â– â–  â–’ 100%</span></div>
+    <div class="mark"></div>
+    <div class="kicker">MONTEUR</div>
+    <div class="h1">Heute unterwegs.</div>
+    <div class="lead">Tour, Navigation, Status â€” alles in einer Hand.</div>
+    <div class="input">E-Mail</div>
+    <div class="input">Passwort</div>
+    <div class="cta">Anmelden</div>
+    <div class="links">Datenschutz Â· FAQ Â· AGB Â· Impressum<br/>Ãœber FieldOps Â· Hilfe</div>
+    <div class="home-bar"></div>
+  </section>
+
+  <!-- FIELD HEUTE -->
+  <section id="field-heute" class="screen field">
+    <div class="status"><span>9:41</span><span>â– â– â–  â–’ 100%</span></div>
+    <div class="org">Mustermann SHK GmbH</div>
+    <div class="title">Heute</div>
+    <div class="card">
+      <div class="meta" style="color:#D4A017;font-weight:800;font-size:11px;letter-spacing:1px">NÃ„CHSTER STOPP</div>
+      <h3>Heizung ausgefallen</h3>
+      <div class="meta">MusterstraÃŸe 12, 60313 Frankfurt am Main<br/>Anna Schmidt</div>
+      <div class="pipeline">
+        <div class="pipe on">Start</div><div class="pipe">Fahrt</div><div class="pipe">Vor Ort</div><div class="pipe">Fertig</div>
+      </div>
+      <div class="row"><div class="btn navy">Navigation</div><div class="btn gold">Anrufen</div></div>
+      <div class="cta" style="margin-top:10px">Einsatz starten</div>
+    </div>
+    <div class="meta" style="margin-top:16px;font-weight:700;color:#F7F4EE">Tour</div>
+    <div class="job"><div style="display:flex;justify-content:space-between"><strong>Heizung ausgefallen</strong><span class="badge" style="background:#1E3A5F;color:#93C5FD">Zugewiesen</span></div><div class="meta">MusterstraÃŸe 12</div></div>
+    <div class="job"><div style="display:flex;justify-content:space-between"><strong>Wartung Therme</strong><span class="badge" style="background:#3F2E0C;color:#FBBF24">Unterwegs</span></div><div class="meta">Zeil 40</div></div>
+    <div class="tabs"><div class="tab on">Heute</div><div class="tab">Tour</div><div class="tab">Post</div><div class="tab">Konto</div></div>
+  </section>
+
+  <!-- FIELD TOUR -->
+  <section id="field-tour" class="screen field">
+    <div class="status"><span>9:41</span><span>â– â– â–  â–’ 100%</span></div>
+    <div class="org">Mustermann SHK GmbH</div>
+    <div class="title">EinsÃ¤tze</div>
+    <div class="job" style="border-color:#D4A017"><div class="meta" style="color:#D4A017;font-weight:800">NEUER EINSATZ</div><h3 style="margin-top:4px">Heizung ausgefallen</h3><div class="meta">MusterstraÃŸe 12, Frankfurt</div></div>
+    <div class="job"><div style="display:flex;justify-content:space-between"><strong>Abnahme nach Einbau</strong><span class="badge" style="background:#064E3B;color:#6EE7B7">Erledigt</span></div><div class="meta">MusterstraÃŸe 12</div></div>
+    <div class="job"><div style="display:flex;justify-content:space-between"><strong>Wartung Therme</strong><span class="badge" style="background:#3F2E0C;color:#FBBF24">Unterwegs</span></div><div class="meta">Zeil 40</div></div>
+    <div class="tabs"><div class="tab">Heute</div><div class="tab on">Tour</div><div class="tab">Post</div><div class="tab">Konto</div></div>
+  </section>
+
+  <!-- FIELD POST -->
+  <section id="field-post" class="screen field">
+    <div class="status"><span>9:41</span><span>â– â– â–  â–’ 100%</span></div>
+    <div class="org">Mustermann SHK GmbH</div>
+    <div class="title">Post</div>
+    <div class="card"><div class="meta" style="color:#D4A017;font-weight:700">Zuweisung</div><h3>Neuer Einsatz</h3><div class="meta">Ihnen wurde â€žHeizung ausgefallenâ€œ zugewiesen.</div></div>
+    <div class="card"><div class="meta">Status</div><h3>Tour aktualisiert</h3><div class="meta">BÃ¼ro hat den Plan fÃ¼r heute geÃ¤ndert.</div></div>
+    <div class="tabs"><div class="tab">Heute</div><div class="tab">Tour</div><div class="tab on">Post</div><div class="tab">Konto</div></div>
+  </section>
+
+  <!-- FIELD KONTO -->
+  <section id="field-konto" class="screen field">
+    <div class="status"><span>9:41</span><span>â– â– â–  â–’ 100%</span></div>
+    <div class="org">Mustermann SHK GmbH</div>
+    <div class="title">Konto</div>
+    <div class="card"><h3>Ali Kaya</h3><div class="meta">ali.kaya@fieldops.test Â· Monteur</div></div>
+    <div class="card"><div class="meta">Datenschutz</div></div>
+    <div class="card"><div class="meta">Hilfe & Support</div></div>
+    <div class="cta" style="background:#14171C;color:#FB7185;border:1px solid #2A313C">Abmelden</div>
+    <div class="tabs"><div class="tab">Heute</div><div class="tab">Tour</div><div class="tab">Post</div><div class="tab on">Konto</div></div>
+  </section>
+
+  <!-- FIELD JOB -->
+  <section id="field-job" class="screen field">
+    <div class="status"><span>9:41</span><span>â– â– â–  â–’ 100%</span></div>
+    <div class="org">Einsatz</div>
+    <div class="title" style="font-size:24px">Heizung ausgefallen</div>
+    <div class="meta">MusterstraÃŸe 12 Â· Anna Schmidt</div>
+    <div class="pipeline" style="margin-top:16px">
+      <div class="pipe on">Start</div><div class="pipe">Fahrt</div><div class="pipe">Vor Ort</div><div class="pipe">Fertig</div>
+    </div>
+    <div class="row" style="margin-top:12px"><div class="btn navy">Navigation</div><div class="btn gold">Anrufen</div></div>
+    <div class="cta">Einsatz starten</div>
+    <div class="row" style="margin-top:14px">
+      <div class="card" style="flex:1;margin:0;min-height:90px;text-align:center;padding-top:28px" class="">Vorher</div>
+      <div class="card" style="flex:1;margin:0;min-height:90px;text-align:center;padding-top:28px">Nachher</div>
+    </div>
+    <div class="card"><div class="meta">Material Â· Unterschrift Â· Zeit</div></div>
+    <div class="home-bar"></div>
+  </section>
+
+  <!-- CUSTOMER LOGIN -->
+  <section id="customer-login" class="screen cust">
+    <div class="status"><span>9:41</span><span>â– â– â–  â–’ 100%</span></div>
+    <div class="mark"></div>
+    <div class="kicker">FIELDOPS KUNDE</div>
+    <div class="h1">WÃ¤rme, Wasser,<br/>wenn Sie uns brauchen.</div>
+    <div class="lead">Ihr SHK-Betrieb bestÃ¤tigt neue Konten. Danach legen Sie AuftrÃ¤ge selbst an.</div>
+    <div class="seg"><button class="on">Anmelden</button><button>Registrieren</button></div>
+    <div class="label">E-Mail</div><div class="input">anna.schmidt@fieldops.test</div>
+    <div class="label">Passwort</div><div class="input">â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢</div>
+    <div class="cta">Anmelden</div>
+    <div class="links">Datenschutz Â· FAQ Â· AGB Â· Impressum</div>
+    <div class="home-bar"></div>
+  </section>
+
+  <!-- CUSTOMER REGISTER -->
+  <section id="customer-register" class="screen cust">
+    <div class="status"><span>9:41</span><span>â– â– â–  â–’ 100%</span></div>
+    <div class="mark"></div>
+    <div class="kicker">FIELDOPS KUNDE</div>
+    <div class="h1">Konto anlegen</div>
+    <div class="seg"><button>Anmelden</button><button class="on">Registrieren</button></div>
+    <div class="label">Handwerksbetrieb</div>
+    <div class="card" style="border-color:#24344D;border-width:2px"><strong>Mustermann SHK GmbH</strong></div>
+    <div class="label">Name</div><div class="input">Anna Schmidt</div>
+    <div class="label">Telefon</div><div class="input">+49 69 123456</div>
+    <div class="label">E-Mail</div><div class="input">anna.schmidt@â€¦</div>
+    <div class="cta">Registrieren</div>
+    <div class="home-bar"></div>
+  </section>
+
+  <!-- CUSTOMER HOME -->
+  <section id="customer-home" class="screen cust">
+    <div class="status"><span>9:41</span><span>â– â– â–  â–’ 100%</span></div>
+    <div class="kicker">MUSTERRMANN SHK</div>
+    <div class="title" style="font-size:28px;font-weight:700;margin-top:6px">Guten Tag, Anna</div>
+    <div class="card">
+      <div class="meta" style="font-size:12px;color:#5C6570;font-weight:700">NÃ„CHSTER TERMIN</div>
+      <h3 style="margin-top:6px">Heizung ausgefallen</h3>
+      <div class="tracker">
+        <div class="step on"><div class="dot"></div>Gesendet</div>
+        <div class="step on"><div class="dot"></div>Geplant</div>
+        <div class="step"><div class="dot"></div>Unterwegs</div>
+        <div class="step"><div class="dot"></div>Teile</div>
+        <div class="step"><div class="dot"></div>Erledigt</div>
+      </div>
+    </div>
+    <div class="cta">Neuen Auftrag anlegen</div>
+    <div class="card"><strong>Rechnung RE-2026-0001</strong><div style="color:#5C6570;font-size:13px;margin-top:4px">Gesendet Â· PDF Ã¶ffnen</div></div>
+    <div class="tabs"><div class="tab on">Home</div><div class="tab">Auftrag</div><div class="tab">Status</div><div class="tab">Post</div></div>
+  </section>
+
+  <!-- CUSTOMER AUFTRAG -->
+  <section id="customer-auftrag" class="screen cust">
+    <div class="status"><span>9:41</span><span>â– â– â–  â–’ 100%</span></div>
+    <div class="title" style="font-size:24px;font-weight:700">Neuer Auftrag</div>
+    <div class="lead">Schritt 2 von 3 - Was ist passiert?</div>
+    <div class="label">Beschreibung</div>
+    <div class="input" style="min-height:90px">Heizung macht GerÃ¤usche, kein Warmwasser.</div>
+    <div class="row" style="display:flex;gap:8px;margin-top:12px">
+      <div class="card" style="flex:1;text-align:center;border-color:#24344D"><strong>Normal</strong></div>
+      <div class="card" style="flex:1;text-align:center"><strong style="color:#BE3B4A">Notdienst</strong></div>
+    </div>
+    <div class="cta">Weiter</div>
+    <div class="tabs"><div class="tab">Home</div><div class="tab on">Auftrag</div><div class="tab">Status</div><div class="tab">Post</div></div>
+  </section>
+
+  <!-- CUSTOMER STATUS -->
+  <section id="customer-status" class="screen cust">
+    <div class="status"><span>9:41</span><span>â– â– â–  â–’ 100%</span></div>
+    <div class="title" style="font-size:24px;font-weight:700">Meine AuftrÃ¤ge</div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center"><strong>Heizung ausgefallen</strong><span class="pill">Geplant</span></div>
+      <div class="tracker" style="margin-top:12px">
+        <div class="step on"><div class="dot"></div>Gesendet</div>
+        <div class="step on"><div class="dot"></div>Geplant</div>
+        <div class="step"><div class="dot"></div>Unterwegs</div>
+        <div class="step"><div class="dot"></div>Teile</div>
+        <div class="step"><div class="dot"></div>Erledigt</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between"><strong>Tropfender Hahn</strong><span class="pill" style="background:#D1FAE5;color:#047857">Erledigt</span></div>
+    </div>
+    <div class="tabs"><div class="tab">Home</div><div class="tab">Auftrag</div><div class="tab on">Status</div><div class="tab">Post</div></div>
+  </section>
+
+  <!-- CUSTOMER POST -->
+  <section id="customer-post" class="screen cust">
+    <div class="status"><span>9:41</span><span>â– â– â–  â–’ 100%</span></div>
+    <div class="title" style="font-size:24px;font-weight:700">Mitteilungen</div>
+    <div class="card"><strong>Einsatz geplant</strong><div style="color:#5C6570;font-size:13px;margin-top:4px">Ihr Termin wurde bestÃ¤tigt.</div></div>
+    <div class="card"><strong>Willkommen</strong><div style="color:#5C6570;font-size:13px;margin-top:4px">Konto freigeschaltet â€” Sie kÃ¶nnen AuftrÃ¤ge senden.</div></div>
+    <div class="tabs"><div class="tab">Home</div><div class="tab">Auftrag</div><div class="tab">Status</div><div class="tab on">Post</div></div>
+  </section>
+</div>
+<script>
+  const id = new URLSearchParams(location.search).get('id') || 'field-login';
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
+  document.title = id;
+</script>
+</body>
+</html>
+
+
+

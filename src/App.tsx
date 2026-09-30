@@ -14,6 +14,7 @@ import { EmptyState, JobCard, MeisterButton, PageHeader, ScreenLoader, StatusPil
 import { euros, activityLabel } from './shared/lib/ui'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AccountantWorkspace, ContentPagesWorkspace, CustomerPortalWorkspace, CustomersWorkspace, FieldWorkspace, JobsWorkspace, NotificationsInbox, TeamWorkspace } from './screens/Workspaces'
+import { CustomerAppScreensPage, FieldAppScreensPage } from './screens/AppScreens'
 
 const qc = new QueryClient()
 
@@ -158,6 +159,8 @@ function Shell({ children, user }: { children: ReactNode; user: User }) {
         { to: '/invoices', label: 'Buchhaltung', icon: Receipt, group: 'Rollen' },
         { to: '/field', label: 'Monteur', icon: Hammer, group: 'Rollen' },
         { to: '/portal', label: 'Kunde', icon: UserRound, group: 'Rollen' },
+        { to: '/apps/field', label: 'Field Screens', icon: Hammer, group: 'Apps' },
+        { to: '/apps/customer', label: 'Kunden Screens', icon: UserRound, group: 'Apps' },
       ]
     : officeNav
       ? [
@@ -168,6 +171,8 @@ function Shell({ children, user }: { children: ReactNode; user: User }) {
           { to: '/notifications', label: 'Mitteilungen', icon: Bell, group: 'Büro' },
           { to: '/invoices', label: 'Rechnungen', icon: Receipt, group: 'Büro' },
           ...(user.role === 'owner' ? [{ to: '/billing', label: 'Abrechnung', icon: CreditCard, group: 'Büro' }] : []),
+          { to: '/apps/field', label: 'Field Screens', icon: Hammer, group: 'Apps' },
+          { to: '/apps/customer', label: 'Kunden Screens', icon: UserRound, group: 'Apps' },
         ]
       : []
 
@@ -1101,6 +1106,8 @@ function AppShell() {
     else if (loc.pathname.startsWith('/billing')) inner = <Billing />
     else if (loc.pathname.startsWith('/notifications')) inner = <NotificationsInbox />
     else if (loc.pathname.startsWith('/content')) inner = <ContentPagesWorkspace />
+    else if (loc.pathname.startsWith('/apps/field')) inner = <FieldAppScreensPage />
+    else if (loc.pathname.startsWith('/apps/customer')) inner = <CustomerAppScreensPage />
     else inner = <Admin />
   } else if (user.role === 'accountant') inner = <Invoices />
   else if (user.role === 'owner' || user.role === 'office') {
@@ -1110,6 +1117,8 @@ function AppShell() {
     else if (loc.pathname.startsWith('/customers')) inner = <CustomersWorkspace />
     else if (loc.pathname.startsWith('/team')) inner = <TeamWorkspace />
     else if (loc.pathname.startsWith('/notifications')) inner = <NotificationsInbox />
+    else if (loc.pathname.startsWith('/apps/field')) inner = <FieldAppScreensPage />
+    else if (loc.pathname.startsWith('/apps/customer')) inner = <CustomerAppScreensPage />
     else inner = <Plantafel />
   }
 
