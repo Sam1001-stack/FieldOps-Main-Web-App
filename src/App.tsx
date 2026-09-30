@@ -1132,6 +1132,22 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/invoices/:id" element={<InvoiceDetail />} />
+          <Route
+            path="/apps/field"
+            element={
+              <div className="min-h-dvh">
+                <FieldAppScreensPage />
+              </div>
+            }
+          />
+          <Route
+            path="/apps/customer"
+            element={
+              <div className="min-h-dvh">
+                <CustomerAppScreensPage />
+              </div>
+            }
+          />
           <Route path="/*" element={<AppShell />} />
         </Routes>
       </BrowserRouter>
